@@ -1,0 +1,107 @@
+import pygame
+from player import player
+from fireball import fireball
+from enemy import enemy
+pygame.init()
+pygame.display.set_caption("top down grid game") # sets the window title
+screen = pygame.display.set_mode((1000, 800)) # creates game screen
+clock = pygame.time.Clock()
+gameover = False #variable to run our game loop
+
+#instantiate a player
+p1 = player()
+#instantiate fireball
+ball = fireball()
+#intantiate enemy
+e1 = enemy()
+
+#CONSTANTS
+LEFT = 0
+RIGHT = 1
+UP = 2
+DOWN = 3
+SPACE = 4
+W = 5
+keys = [False, False, False, False, False, False] #this list holds whether each key has been pressed
+
+map = [[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2],
+       [2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2],
+       [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]]
+
+brick = pygame.image.load('brick.png')
+
+while not gameover:#GAME LOOP--------------------------------------------
+    clock.tick(60) #FPA
+    #input section-------------------------------------------------------
+    for event in pygame.event.get(): #quit game if x is pressed in top corner
+        if event.type == pygame.QUIT:
+            gameover = True
+        if event.type == pygame.KEYDOWN: #keyboard input
+            if event.key == pygame.K_LEFT:
+                keys[LEFT] = True
+            if event.key == pygame.K_RIGHT:
+                keys[RIGHT] = True
+            if event.key == pygame.K_UP:
+                keys[UP] = True
+            if event.key == pygame.K_DOWN:
+                keys[DOWN] = True
+            elif event.key == pygame.K_SPACE:
+                keys[SPACE] = True
+                
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                keys[LEFT] = False
+            if event.key == pygame.K_RIGHT:
+                keys[RIGHT] = False
+            if event.key == pygame.K_UP:
+                keys[UP] = False
+            if event.key == pygame.K_DOWN:
+                keys[DOWN] = False
+            elif event.key == pygame.K_SPACE:
+                keys[SPACE] = False              
+                
+                
+    #physics section-----------------------------------------------------
+                
+      #check space for shooting
+    if keys[SPACE] == True:
+        ball.shoot(p1.xpos, p1.ypos, p1.direction)
+        
+    p1.move(keys, map)
+    
+ 
+    
+    ball.move()
+    e1.move(map, ticker, p1.xpos, p1.ypos)
+    
+    #render section------------------------------------------------------
+    screen.fill((0,0,0)) #wipe screen so it doesn't smear
+    #draw map
+    for i in range(10):
+        for j in range(10):
+            if map[i][j] == 1:
+                screen.blit(dirt, (j * 50, i *50), (0, 0, 50, 50))
+            if map[i][j] == 2:
+                screen.blit(brick, (j * 50, i * 50), (0, 0, 50, 50))
+
+    p1.draw(screen)
+    
+    if ball.isAlive == True:
+        ball.draw(screen)
+    
+    if e1.isAlive == True:
+        e1.draw(screen)
+        
+    pygame.display.flip()# this actually puts the pixel on the screen
+    
+#end game loop-----------------------------------------------------------
+pygame.quit()
+
